@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -15,9 +16,8 @@ if (!function_exists('pCommonDBName')) {
      */
     function pCommonDBName()
     {
-       
+
         return DB::connection('mysql')->getDatabaseName();
-     
     }
 }
 
@@ -32,9 +32,8 @@ if (!function_exists('pBusinessDBName')) {
      */
     function pBusinessDBName()
     {
-       
+
         return DB::connection('businessDB')->getDatabaseName();
-     
     }
 }
 //get Wfm Rel Db
@@ -48,11 +47,25 @@ if (!function_exists('pWfmDBName')) {
      */
     function pWfmDBName()
     {
-       
+
         return DB::connection('wfmDB')->getDatabaseName();
-     
     }
-    // This function will return logged in users select accounts organization id
+}
+//get Common Db Connection Name
+if (!function_exists('pCommonDBConnectionName')) {
+
+    /**
+     * Returns a pAuthOrganizationId
+     *
+     * @return int or Null
+     *
+     */
+    function pCommonDBConnectionName()
+    {
+        return 'mysql';
+    }
+}
+// Get Bussiness DB Connection Name
 if (!function_exists('pBusinessDBConnectionName')) {
 
     /**
@@ -66,6 +79,7 @@ if (!function_exists('pBusinessDBConnectionName')) {
         return 'businessDB';
     }
 }
+// Get Wfm DB Connection Name
 if (!function_exists('pWfmDBConnectionName')) {
 
     /**
@@ -78,5 +92,4 @@ if (!function_exists('pWfmDBConnectionName')) {
     {
         return 'wfmDB';
     }
-}
 }
