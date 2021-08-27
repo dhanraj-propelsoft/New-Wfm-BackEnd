@@ -11,16 +11,16 @@ use Illuminate\Support\Facades\Storage;
 use Session;
 use Illuminate\Support\Facades\Validator;
 use Auth;
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Http\Controllers\Common\Repository\CommonRepository;
 use App\Notification\Service\SmsNotificationService;
 use App\Notification\Service\EmailNotificationService;
 use Hash;
 use App\Http\Controllers\Common\Model\PersonVO;
-use App\Http\Controllers\Common\Model\PersonMobile;
-use App\Person;
-use App\Http\Controllers\Common\Model\PersonEmail;
+use  App\Models\PersonModel\PersonMobile;
+use App\Models\PersonModel\Person;
+use  App\Models\PersonModel\PersonEmail;
 class CommonService
 {
 

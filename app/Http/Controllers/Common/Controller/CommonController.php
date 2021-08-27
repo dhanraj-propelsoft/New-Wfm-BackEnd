@@ -59,6 +59,7 @@ class CommonController extends Controller
 
     public function signup(Request $request)
     {
+       
         $userModel = false;
         if($request->password){
             $userModel = true;

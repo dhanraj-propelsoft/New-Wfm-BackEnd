@@ -93,3 +93,44 @@ if (!function_exists('pWfmDBConnectionName')) {
         return 'wfmDB';
     }
 }
+// This function return success status
+if (!function_exists('pStatusSuccess')) {
+
+    /**
+     * Returns a status string
+     *
+     * @return string
+     *
+     */
+    function pStatusSuccess()
+    {
+        return 'SUCCESS';
+    }
+}
+
+// This function return failed status
+if (!function_exists('pStatusFailed')) {
+
+    /**
+     * Returns a status string
+     *
+     * @return string
+     *
+     */
+    function pStatusFailed()
+    {
+        return 'FAILED';
+    }
+}
+if (!function_exists('pGenarateOTP')) {
+ function pGenarateOTP($num)
+    {
+        $x = $num - 1;
+
+        $min = pow(10, $x);
+        $max = pow(10, $x + 1) - 1;
+        $value = rand($min, $max);
+
+        return $value;
+    }
+}

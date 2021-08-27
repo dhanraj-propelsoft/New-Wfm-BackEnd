@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Person;
 use Auth;
 use Session;
+use App\Models\UserModel\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -18,7 +19,8 @@ class LoginController extends Controller
 
 	public function login()
 	{
-dd(pAuthMainDBName());
+
+
 		$result = $this->signin(request('mobile'),request('password'));
 
 
@@ -40,7 +42,7 @@ dd(pAuthMainDBName());
 		if(Auth::attempt(['mobile' => $mobile_no, 'password' => $password, 'status' => 1])) {
 
 
-			$user = Auth::user();
+			$user = Auth::User();
 
 			$success['status'] = 1;
 			$success['user'] =  $user;

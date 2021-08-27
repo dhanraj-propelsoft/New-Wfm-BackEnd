@@ -20,4 +20,7 @@ header('Access-Control-Allow-Headers:  Content-Type, X-Auth-Token, Origin, Autho
 */
 Route::post('login', 'App\Http\Controllers\Entitlement\Controller\LoginController@login');
 
-    include_once ('login-api.php');
+
+Route::post('signup', 'App\Http\Controllers\Common\Controller\CommonController@signup');
+
+    // include_once ('login-api.php');
