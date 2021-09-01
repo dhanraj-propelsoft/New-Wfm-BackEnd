@@ -47,50 +47,50 @@ class CommonService
 
                return $response;
        }
-        public function createPersonTmpFile($datas)
-        {
+       public function createPersonTmpFile($datas)
+       {
 
 
-            $otp = pGenarateOTP(4);
-            $datas['otp'] = $otp;
-            $data = (object)$datas;
-            $mobileNo = $data->mobile_no;
-            $name = $data->first_name;
-            $fileName = $mobileNo.".json";
+           $otp = pGenarateOTP(4);
+           $datas['otp'] = $otp;
+           $data = (object)$datas;
+           $mobileNo = $data->mobile_no;
+           $name = $data->first_name;
+           $fileName = $mobileNo.".json";
 
-            $encodedData = json_encode($datas);
+           $encodedData = json_encode($datas);
 
-            //find file name
-            if(Storage::disk('local')->exists($fileName))
+           //find file name
+           if(Storage::disk('local')->exists($fileName))
+           {
+               // Remove temp file
+               Storage::disk('local')->delete($fileName);
+           }
+            // create temp file
+            if(Storage::disk('local')->put($fileName, $encodedData))
             {
-                // Remove temp file
-                Storage::disk('local')->delete($fileName);
+                   $subject = "User verification";
+                   $smsContent = pSmsParser('UserVerificationOTP', ['{otp}' => $otp]);
+
+                   $smsNotifyModel = $this->smsNotifyService->save($mobileNo, $subject, $name, $smsContent,"", "OTP");
+                   if($smsNotifyModel['message'] == pStatusSuccess())
+                   {
+                       $response = ['message' => pStatusSuccess(),'data' =>  "Validate OTP"];
+
+                   }else
+                   {
+                       $response = ['message' => pStatusFailed(),'data' =>  "Something Went wrong Please recreate"];
+                   }
+
             }
-             // create temp file
-             if(Storage::disk('local')->put($fileName, $encodedData))
-             {
-                    $subject = "User verification";
-                    $smsContent = pSmsParser('UserVerificationOTP', ['{otp}' => $otp]);
+            else
+            {
+                $response = ['message' => pStatusFailed(),'data' => "Went Wrong With Verify OTP"];
+            }
 
-                    $smsNotifyModel = $this->smsNotifyService->save($mobileNo, $subject, $name, $smsContent,"", "OTP");
-                    if($smsNotifyModel['message'] == pStatusSuccess())
-                    {
-                        $response = ['message' => pStatusSuccess(),'data' =>  "Validate OTP"];
+           return $response;
 
-                    }else
-                    {
-                        $response = ['message' => pStatusFailed(),'data' =>  "Something Went wrong Please recreate"];
-                    }
-
-             }
-             else
-             {
-                 $response = ['message' => pStatusFailed(),'data' => "Went Wrong With Verify OTP"];
-             }
-
-            return $response;
-
-        }
+       }
         public function getTmpPersonFile($datas)
         {
             Log::info('CommonService->signup:-Inside '.json_encode($datas));
@@ -114,6 +114,10 @@ class CommonService
 
             return $response;
         }
+
+
+
+        
         public function savePerson($datas)
         {
             $datas = (object)$datas;
@@ -425,6 +429,7 @@ class CommonService
 
         public function convertToPersonModel($datas)
         {
+
            
            if($datas->pId)
            {

@@ -7,219 +7,195 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Session;
 use DB;
-use App\Person;
-use App\Http\Controllers\Common\Model\PersonMobile;
-use App\Http\Controllers\Common\Model\PersonEmail;
-use App\AdminModel\Salutation;
-use App\Gender;
+
+use App\Models\PersonModel\Person;
+use App\Models\PersonModel\PersonMobile;
+use App\Models\PersonModel\PersonEmail;
+use App\Models\AdminModel\Salutation;
+use App\Models\AdminModel\Gender;
 use App\User;
-use App\BloodGroup;
+use App\Models\AdminModel\BloodGroup;
 
 
 class CommonRepository
 {
-     public function getPersonByParameters($mobileNo=false,$email = false,$person_id =false)
-     {
-          $datas = Person::with('personMobile','user','personEmail');
-          $datas->whereHas('personMobile', function ($query) use ($mobileNo)
-          {
-             $query->where(['mobile_no' => $mobileNo]);
-          });
+    public function getPersonByParameters($mobileNo = false, $email = false, $person_id = false)
+    {
+        $datas = Person::with('personMobile', 'user', 'personEmail');
+        $datas->whereHas('personMobile', function ($query) use ($mobileNo) {
+            $query->where(['mobile_no' => $mobileNo]);
+        });
 
-//           if($mobileNo&&$email)
-//           {
-//              return $datas->get();
-//           }
-//           else
-//           {
-               $datass = $datas->first();
-//           }
+        //           if($mobileNo&&$email)
+        //           {
+        //              return $datas->get();
+        //           }
+        //           else
+        //           {
+        $datass = $datas->first();
+        //           }
 
-          return $datass;
-     }
-
-     
-     public function getpersonIdByMobileNo($mobile_no)
-     {
-
-        $query = PersonMobile::where('mobile_no',$mobile_no)->first();
+        return $datass;
+    }
 
 
-        if($query != null){
+    public function getpersonIdByMobileNo($mobile_no)
+    {
+
+        $query = PersonMobile::where('mobile_no', $mobile_no)->first();
+
+
+        if ($query != null) {
 
             return $query;
-
-        }else{
+        } else {
             return false;
         }
+    }
+    public function findAllSalutations()
+    {
 
-        
-     }
-     public function findAllSalutations()
-     {
-
-       $query =  Salutation::get();
-
-       return $query;
-
-        
-     }
-     public function findAllGender()
-     {
-
-       $query =  Gender::get();
-
-       return $query;
-
-        
-     }
-
-     public function findAllBloodGroups()
-     {
-
-       $query =  BloodGroup::get();
-
-       return $query;
-
-        
-     }
-
-     public function get_account_list($mobile_no)
-     {
-
-        $query = PersonMobile::where('mobile_no',$mobile_no)->get();
+        $query =  Salutation::get();
 
         return $query;
+    }
+    public function findAllGender()
+    {
+
+        $query =  Gender::get();
+
+        return $query;
+    }
+
+    public function findAllBloodGroups()
+    {
+
+        $query =  BloodGroup::get();
+
+        return $query;
+    }
+
+    public function get_account_list($mobile_no)
+    {
+
+        $query = PersonMobile::where('mobile_no', $mobile_no)->get();
+
+        return $query;
+    }
+
+    public function checkmailidByPersonId_and_email($personId, $email)
+    {
 
 
-        
-        
-     }
+        $query = PersonEmail::where('person_id', $personId)
+            ->where('email', $email)
+            ->first();
 
-     public function checkmailidByPersonId_and_email($personId,$email)
-     {
 
-        
-        $query = PersonEmail::where('person_id',$personId)
-                            ->where('email',$email)
-                            ->first();
-       
-
-        if($query != null){
+        if ($query != null) {
 
             return $query;
-
-        }else{
+        } else {
             return false;
         }
+    }
 
 
-
-        
-     }
-
-
-     public function findDataByPersonId($personId)
-     {
-        $query = Person::with('personMobile','user','personEmail')
-                ->where('id',$personId)
-                ->first();
+    public function findDataByPersonId($personId)
+    {
+        $query = Person::with('personMobile', 'user', 'personEmail')
+            ->where('id', $personId)
+            ->first();
 
 
 
         return $query;
-     }
-     public function getUserDataByUserId($userId)
-     {
+    }
+    public function getUserDataByUserId($userId)
+    {
         $model = User::findOrFail($userId);
         return $model;
-     }
-     public function saveUser($model)
-     {
-            try {
+    }
+    public function saveUser($model)
+    {
+        try {
 
-                $result = DB::transaction(function () use ($model) {
+            $result = DB::transaction(function () use ($model) {
 
-                    $model->save();
-                    return [
-                        'message' => pStatusSuccess(),
-                        'data' => $model
-                    ];
-                });
-
-                return $result;
-            } catch (\Exception $e) {
-
+                $model->save();
                 return [
-                    'message' => pStatusFailed(),
-                    'data' => $e
+                    'message' => pStatusSuccess(),
+                    'data' => $model
                 ];
-            }
+            });
 
-          }
-          public function savePerson($model)
-               {
-                      try {
+            return $result;
+        } catch (\Exception $e) {
 
-                          $result = DB::transaction(function () use ($model) {
+            return [
+                'message' => pStatusFailed(),
+                'data' => $e
+            ];
+        }
+    }
+    public function savePerson($model)
+    {
+        try {
 
-                              $model->save();
-                              return [
-                                  'message' => pStatusSuccess(),
-                                  'data' => $model
-                              ];
-                          });
+            $result = DB::transaction(function () use ($model) {
 
-                          return $result;
-                      } catch (\Exception $e) {
+                $model->save();
+                return [
+                    'message' => pStatusSuccess(),
+                    'data' => $model
+                ];
+            });
 
-                          return [
-                              'message' => pStatusFailed(),
-                              'data' => $e
-                          ];
-                      }
+            return $result;
+        } catch (\Exception $e) {
 
-                    }
+            return [
+                'message' => pStatusFailed(),
+                'data' => $e
+            ];
+        }
+    }
 
-        public function signup($personModel,$personMobilemodel,$personEmailModel,$usermodel){
-                        
-            try {
+    public function signup($personModel, $personMobilemodel, $personEmailModel, $usermodel)
+    {
 
-            $result = DB::transaction(function () use ($personModel,$personMobilemodel,$personEmailModel,$usermodel) {
+        try {
+
+            $result = DB::transaction(function () use ($personModel, $personMobilemodel, $personEmailModel, $usermodel) {
 
 
                 $personModel->save();
-                
+
                 $personModel->personMobile()->save($personMobilemodel);
 
                 $personModel->personEmail()->save($personEmailModel);
-                if($usermodel){
-                $personModel->user()->save($usermodel);
+                if ($usermodel) {
+                    $personModel->user()->save($usermodel);
                 }
 
-            // Log::info('TaskRepository->TaskSave:Success-'.json_encode($model));   
+                // Log::info('TaskRepository->TaskSave:Success-'.json_encode($model));   
                 return [
-                    'status'=>1,
-                    'message'=>pStatusSuccess(),
+                    'status' => 1,
+                    'message' => pStatusSuccess(),
                     'data' => $personModel
                 ];
             });
-           
+
             return $result;
-        } catch (\Exception $e) { 
+        } catch (\Exception $e) {
 
             // Log::info('TaskRepository->TaskSave:Error-'.json_encode($e)); 
 
             return [
-                'status'=>0,
+                'status' => 0,
                 'message' => $e,
                 'data' => ""
             ];
-        }    
-
-
         }
-
-
-
+    }
 }

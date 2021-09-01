@@ -32,29 +32,29 @@ class EmailNotificationService
 
     public function changeSentStatus($model)
     {
-        Log::channel('daily_job')->info('EmailNotificationService->changeSentStatus:- Inside');
+        Log::info('EmailNotificationService->changeSentStatus:- Inside');
         $model->status = 1;
-        Log::channel('daily_job')->info('EmailNotificationService->changeSentStatus:- Return');
+        Log::info('EmailNotificationService->changeSentStatus:- Return');
         return $model;
     }
 
     public function save($toId, $subject, $contentAddressedTo, $content ,$template,$organizationId =false)
     {
-        Log::channel('daily_job')->info('EmailNotificationService->save:- Inside');
+        Log::info('EmailNotificationService->save:- Inside');
         $model = $this->createModel($toId, $subject, $contentAddressedTo, $content,$template,$organizationId);
         $response = $this->repo->save($model);
-        Log::channel('daily_job')->info('EmailNotificationService->save:- return');
+        Log::info('EmailNotificationService->save:- return');
         return $response;
     }
 
     public function sendOutEmailNotification()
     {
-        Log::channel('daily_job')->info('EmailNotificationService->sendOutNotification:- Inside');
+        Log::info('EmailNotificationService->sendOutNotification:- Inside');
 
         $models = $this->repo->findAll();
 
         collect($models)->map(function ($model) {
-            Log::channel('daily_job')->info('EmailNotificationService->sendOutNotification:- $model ' . json_encode($model));
+            Log::info('EmailNotificationService->sendOutNotification:- $model ' . json_encode($model));
 
             try {
                 
@@ -75,20 +75,20 @@ class EmailNotificationService
                         $model = $this->changeSentStatus($model);
                         $data = $this->repo->save($model);
                     } else {
-                        Log::channel('daily_job')->info('EmailNotificationService->sendOutNotification:- failed ' . $model->id . ' Fail Count ' . json_encode($failCount));
+                        Log::info('EmailNotificationService->sendOutNotification:- failed ' . $model->id . ' Fail Count ' . json_encode($failCount));
                         $model->error = "Failed to send out email to id - ".json_encode($model->to_id);
                         $model->retry_count = $model->retry_count + 1;
                         $data = $this->repo->save($model);
                     }
             } catch (Exception $e) {
-                Log::channel('daily_job')->info('EmailNotificationService->sendOutNotification:- failed catch ' . $model->id . ' - ' . json_encode($e));
+                Log::info('EmailNotificationService->sendOutNotification:- failed catch ' . $model->id . ' - ' . json_encode($e));
                 $model->error = "Failed to send out email to id - ".json_encode($model->to_id). " Reason:- ".json_encode($e);
                 $model->retry_count = $model->retry_count + 1;
                 $data = $this->repo->save($model);
             }
         });
 
-            Log::channel('daily_job')->info('EmailNotificationService->sendOutNotification:- END');
+            Log::info('EmailNotificationService->sendOutNotification:- END');
     }
 
 }

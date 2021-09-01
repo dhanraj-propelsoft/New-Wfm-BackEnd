@@ -29,6 +29,7 @@ class CreateUsersTable extends Migration
             $table->integer('person_id', false)->unsigned();
             $table->integer('is_active', false)->default(0)->comment('0 - User not Purchased the application, 1 - User Purchased the application');
             $table->integer('status', false)->default(0)->comment('0 - Un-Verified, 1 - Verified');
+            $table->string('api_token', 60)->unique();
             $table->timestamps();
             //$table->foreign('person_id')->references('id')->on('persons')->onDelete('restrict');
         });

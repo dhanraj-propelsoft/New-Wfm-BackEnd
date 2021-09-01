@@ -16,7 +16,7 @@ class CreatePersonsTable extends Migration
         Schema::create('persons', function (Blueprint $table) {
             
              $table->increments('id');
-            $table->string('crm_code', 10)->unique();
+            $table->string('crm_code', 10)->unique()->nullable(true);
             $table->integer('salutation', false)->unsigned()->nullable();
             $table->string('first_name');
             $table->string('middle_name')->nullable();

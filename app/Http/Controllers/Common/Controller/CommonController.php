@@ -19,10 +19,23 @@ class CommonController extends Controller
             $this->service = $service;
         }
 
+        public function createPersonTmpFile(Request $request)
+        {
+           $datas = $this->service->createPersonTmpFile($request->all());
+           return $datas;
+        }
+        public function getTmpPersonFile(Request $request)
+        {
+            $datas = $this->service->getTmpPersonFile($request->all());
+            return $datas;
+        }
 
+        
     public function getPersonByMobileNo($mobileNo)
     {
+        Log::info('CommonController->getPersonByMobileNo:-Inside ');
         $datas = $this->service->getPersonByParameter($mobileNo);
+        Log::info('CommonController->getPersonByMobileNo:-Inside '.json_encode($datas));
         return $datas;
     }
     public function sendOtp()
@@ -46,33 +59,9 @@ class CommonController extends Controller
        $datas = $this->service->updatePassword($request->all());
        return $datas;
     }
-    public function createPersonTmpFile(Request $request)
-    {
-       $datas = $this->service->createPersonTmpFile($request->all());
-       return $datas;
-    }
-    public function getTmpPersonFile(Request $request)
-    {
-        $datas = $this->service->getTmpPersonFile($request->all());
-        return $datas;
-    }
+   
 
-    public function signup(Request $request)
-    {
-       
-        $userModel = false;
-        if($request->password){
-            $userModel = true;
-        }
-
-        Log::info('CommonController->Signup:-Inside '.json_encode($request->all()));
-        $Data = $this->service->signup($request->all(),$userModel);
-        Log::info('CommonController->Signup:-Return '.json_encode($Data));
-
-        return response()->json($Data);
-        
-    }
-
+   
      public function updatePassword_and_login(Request $request)
     {
         Log::info('CommonController->signin:-Inside ');

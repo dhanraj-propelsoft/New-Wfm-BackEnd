@@ -21,7 +21,7 @@ class SmsNotificationService
 
     public function createModel($mobileNo, $subject, $contentAddressedTo, $content,$organizationId = false,$category)
     {
-        Log::channel('daily_job')->info('SmsNotificationService->createModel:- Inside');
+       Log::info('SmsNotificationService->createModel:- Inside');
         $model = new SmsNotification();
         $model->category = $category;
         $model->from_number = "11110000";
@@ -31,7 +31,7 @@ class SmsNotificationService
         $model->content = $content;
         $model->organization_id = ($organizationId)?$organizationId:null;
         $model->status = 0; // is numberic not a string
-        Log::channel('daily_job')->info('SmsNotificationService->createModel:- return' . json_encode($model));
+       Log::info('SmsNotificationService->createModel:- return' . json_encode($model));
         return $model;
     }
 
@@ -54,23 +54,23 @@ class SmsNotificationService
 
     public function changeSentStatus($model)
     {
-        Log::channel('daily_job')->info('SmsNotificationService->changeSentStatus:- Inside');
+       Log::info('SmsNotificationService->changeSentStatus:- Inside');
         $model->status = 1;
-        Log::channel('daily_job')->info('SmsNotificationService->changeSentStatus:- Return');
+       Log::info('SmsNotificationService->changeSentStatus:- Return');
         return $model;
     }
 
     public function save($mobileNo, $subject, $contentAddressedTo, $content,$organizationId = false,$category)
     {
 
-        Log::channel('daily_job')->info('SmsNotificationService->save:- Inside');
+       Log::info('SmsNotificationService->save:- Inside');
         // $propelOrgId = $this->orgRepo->findByName("Propelsoft");
         // $orgId = ($organizationId)?$organizationId:$propelOrgId->id;
         $orgId = 1;
 
         $model = $this->createModel($mobileNo, $subject, $contentAddressedTo, $content,$organizationId,$category);
         $response = $this->repo->save($model);
-        Log::channel('daily_job')->info('SmsNotificationService->save:- return');
+       Log::info('SmsNotificationService->save:- return');
         return $response;
     }
 
@@ -93,18 +93,18 @@ class SmsNotificationService
 
     public function sendOutSmsNotification()
     {
-        Log::channel('daily_job')->info('SmsNotificationService->sendOutSmsNotification:- Inside');
+       Log::info('SmsNotificationService->sendOutSmsNotification:- Inside');
         
         $models = $this->repo->findAll();
         
         collect($models)->map(function ($model) {
-            Log::channel('daily_job')->info('SmsNotificationService->sendOutSmsNotification:- $model ' . json_encode($model));
+           Log::info('SmsNotificationService->sendOutSmsNotification:- $model ' . json_encode($model));
             
             try {
                 
                 $toMobileNo = $model->to_number;
                 $message = $model->content;
-                Log::channel('daily_job')->info('SmsNotificationService->sendOutSmsNotification:- message ' . json_encode($message));
+               Log::info('SmsNotificationService->sendOutSmsNotification:- message ' . json_encode($message));
                 $text = rawurlencode($message);
                 
                 $url_1 = config('app.sms_gateway_url');
@@ -134,7 +134,7 @@ class SmsNotificationService
                 
                 //$url = 'http://trans.smsfresh.co/api/sendmsg.php?user=' . $user . '&pass=' . $pass . '&sender=' . $sender . '&phone=' . $toMobileNo . '&text=' . $text . '&priority=ndnd&stype=normal';
                 //$url = conf//ig('app.sms_gateway_url') . 'user=' . config('app.sms_gateway_username') . '&pass=' . config('app.sms_gateway_password') . '&sender=' . config('app.sms_gateway_sender') . '&phone=' . $toMobileNo . '&text=' . $text . '&priority=' . config('app.sms_priority') . '&stype=' . config('app.sms_type');
-                Log::channel('daily_job')->info('SmsNotificationService->sendOutSmsNotification:- Success ' . $url);
+               Log::info('SmsNotificationService->sendOutSmsNotification:- Success ' . $url);
                 if($url){
                     $ch = curl_init();
                     curl_setopt($ch, CURLOPT_URL, $url);
@@ -147,34 +147,34 @@ class SmsNotificationService
                     ]);
 
                     $message_id = curl_exec($ch);
-                    Log::channel('daily_job')->info('SmsNotificationService->sendOutSmsNotification:- message_id ' . $message_id);
+                   Log::info('SmsNotificationService->sendOutSmsNotification:- message_id ' . $message_id);
 
                     if ($message_id) {
                         $model = $this->changeSentStatus($model);
                         $model->message_id = $message_id;
                         $data = $this->repo->save($model);
-                        Log::channel('daily_job')->info('SmsNotification Service->sendOutSmsNotification:- Success ' . $model->id);
+                       Log::info('SmsNotification Service->sendOutSmsNotification:- Success ' . $model->id);
 
                         //update sms_ledger
                         $smsLedger =array("sms_notification_id"=>$model->id,'sms_ledger_type'=>"debit",'organization_id'=>$model->organization_id);
-                        Log::channel('daily_job')->info('SmsNotificationService->sendOutSmsNotification:- sms_ledger ' .JSON_ENCODE($smsLedger));
+                       Log::info('SmsNotificationService->sendOutSmsNotification:- sms_ledger ' .JSON_ENCODE($smsLedger));
                         $smsLedgerSave = $this->saveSmsLedger($smsLedger);
 
                     } else {
-                        Log::channel('daily_job')->info('SmsNotificationService->sendOutSmsNotification:- failed ' . $model->id);
+                       Log::info('SmsNotificationService->sendOutSmsNotification:- failed ' . $model->id);
                         $model->error = "Failed to send out Sms to id - " . json_encode($model->to_number);
                         $model->retry_count = $model->retry_count + 1;
                         $data = $this->repo->save($model);
                     }
                 }
             } catch (Exception $e) {
-                Log::channel('daily_job')->info('SmsNotificationService->sendOutSmsNotification:- failed catch ' . $model->id . ' - ' . json_encode($e));
+               Log::info('SmsNotificationService->sendOutSmsNotification:- failed catch ' . $model->id . ' - ' . json_encode($e));
                 $model->error = "Failed to send out Sms to id - " . json_encode($model->to_id) . " Reason:- " . json_encode($e);
                 $model->retry_count = $model->retry_count + 1;
                 $data = $this->repo->save($model);
             }
         });
             
-            Log::channel('daily_job')->info('EmailNotificationService->sendOutSmsNotification:- END');
+           Log::info('EmailNotificationService->sendOutSmsNotification:- END');
     }
 }
