@@ -11,7 +11,7 @@ class Organization extends Model
     public function __construct()
     {
         parent::__construct();
-        $this->connection = "mysql2";
+        $this->connection = pBusinessDBName();
     }
 
     public function OrganizationAddress(){

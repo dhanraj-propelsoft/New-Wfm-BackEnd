@@ -59,8 +59,14 @@ Route::post('createPersonTmpFile', 'App\Http\Controllers\Common\Controller\Commo
 Route::post('getTmpPersonFile', 'App\Http\Controllers\Common\Controller\CommonController@getTmpPersonFile');
 
 Route::post('personCreation', 'App\Http\Controllers\Common\Controller\PersonController@personCreation');
+
+Route::post('userCreation', 'App\Http\Controllers\Common\Controller\PersonController@userCreation');
+
 // include_once ('login-api.php');
 Route::group(['middleware' => ['auth:api']], function () {
+
+    Route::resource('employee', 'App\Http\Controllers\Employee\Controller\EmployeeController');
+
     Route::post('logout', 'App\Http\Controllers\Entitlement\Controller\LoginController@logout');
     include_once('organization-api.php');
 });

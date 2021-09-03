@@ -11,28 +11,27 @@ use App\Models\OrganizationModel\Organization;
 use App\Models\OrganizationModel\OrganizationCategory;
 use App\Models\OrganizationModel\rganizationOwnership;
 
-class OrganizationRepository 
+class OrganizationRepository
 {
-    
+
 
     public function findAll()
-    {   
-        
-       Log::info('ProjectMasterRepository->findAll:-Inside ');
-        $result =  Organization::with('OrganizationAddress','OrganizationCategory','OrganizationOwnership','OrganizationPersonlist')
-            ->whereHas('OrganizationPersonlist', function($q){
+    {
+
+        Log::info('ProjectMasterRepository->findAll:-Inside ');
+        $result =  Organization::with('OrganizationAddress', 'OrganizationCategory', 'OrganizationOwnership', 'OrganizationPersonlist')
+            ->whereHas('OrganizationPersonlist', function ($q) {
                 $q->where('person_id', Auth::user()->person_id);
             })->get();
-       Log::info('ProjectMasterRepository->findAll:-Return '. json_encode($result));
-       return $result;
-        
+        Log::info('ProjectMasterRepository->findAll:-Return ' . json_encode($result));
+        return $result;
     }
-    public function save($model,$OrganizationPersonmodel)
-    { 
+    public function save($model, $OrganizationPersonmodel)
+    {
 
-           try {
-            
-            $result = DB::transaction(function () use ($model,$OrganizationPersonmodel) {
+        try {
+
+            $result = DB::transaction(function () use ($model, $OrganizationPersonmodel) {
 
 
                 $model->save();
@@ -41,35 +40,62 @@ class OrganizationRepository
 
                 return [
                     'status' => 1,
-                    'message'=>pStatusSuccess(),
+                    'message' => pStatusSuccess(),
                     'data' => $model
                 ];
             });
-           
+
             return $result;
-        } catch (\Exception $e) { 
+        } catch (\Exception $e) {
             return [
                 'status' => 0,
-                'message' =>pStatusFailed(),
+                'message' => pStatusFailed(),
                 'data' => $e
             ];
         }
-    
-      
-    } 
+    }
+
+
+    public function saveOrgPerson($model)
+    {
+
+        try {
+
+            $result = DB::transaction(function () use ($model) {
+
+
+                $model->save();
+
+
+
+                return [
+                    'status' => 1,
+                    'message' => pStatusSuccess(),
+                    'data' => $model
+                ];
+            });
+
+            return $result;
+        } catch (\Exception $e) {
+            return [
+                'status' => 0,
+                'message' => pStatusFailed(),
+                'data' => $e
+            ];
+        }
+    }
 
     public function findById($id)
     {
         Log::info('OrganizationRepository->findById:-Inside ');
 
         $result =  Organization::findOrFail($id);
-       
 
-        Log::info('OrganizationRepository->findById:-Return '. json_encode($result));
 
-       return $result;
-              
-    }  
+        Log::info('OrganizationRepository->findById:-Return ' . json_encode($result));
+
+        return $result;
+    }
 
     public function getOrgMasterData()
     {
@@ -79,13 +105,10 @@ class OrganizationRepository
 
 
         $ownership =  OrganizationOwnership::get();
-       
+
 
         Log::info('OrganizationRepository->findById:-Return ');
 
-       return ['status'=>1,'CategoryData'=>$category,'ownershipData'=>$ownership];
-              
+        return ['status' => 1, 'CategoryData' => $category, 'ownershipData' => $ownership];
     }
-       
-   
 }

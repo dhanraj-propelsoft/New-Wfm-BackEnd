@@ -41,6 +41,28 @@ class PersonRepository implements PersonRepositoryInterface
             ];
         }
     }
+    public function saveUser($model)
+    {
+        try {
+
+            $result = DB::transaction(function () use ($model) {
+
+                $model->save();
+                return [
+                    'message' => pStatusSuccess(),
+                    'data' => $model
+                ];
+            });
+
+            return $result;
+        } catch (\Exception $e) {
+
+            return [
+                'message' => pStatusFailed(),
+                'data' => $e
+            ];
+        }
+    }
     public function savePersonEmail(Person $model)
     {
         try {
