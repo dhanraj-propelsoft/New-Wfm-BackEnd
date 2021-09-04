@@ -10,36 +10,43 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Common\Services\PersonService;
 use App\Models\AdminModel\HrmEmployee;
 use App\Models\PersonModel;
-use App\Http\Controllers\Employee\Repository\EmployeeRepository;
 use App\Http\Controllers\Organization\Services\OrganizationService;
+use App\Http\Controllers\Organization\Services\OrganizationPersonService;
+use App\Http\Controllers\Employee\Service\EmployeeService;
+use App\Http\Controllers\Employee\Repository\EmployeeRepository;
 
-class EmployeeService
+class EmployeeService1
 {
-    public function __construct(
-        PersonService $personService,
-        EmployeeRepository $employeeRepo,
-        OrganizationService $organizationService
-    ) {
-        $this->personService = $personService;
-        $this->employeeRepo = $employeeRepo;
-        $this->organizationService = $organizationService;
-    }
-    public function employeeStore($datas)
+    public function __construct(PersonService $personService,EmployeeRepository $employeeRepository,OrganizationPersonService $orgPersonService)
     {
-dd($datas);
+        $this->personService = $personService;
+       
+        $this->employeeRepo =$employeeRepository;
+        $this->orgPersonService = $orgPersonService;
+    }
+
+    public function employeeStore($datas, $id = false)
+    {
+
+
+
         // $datas = (object)$datas;
         $type = "employee";
-        dd($type);
+       
         $storePerson = $this->personService->personCreate($datas, $type);
 
-        $orginalDatas = (object)$datas->all();
+       
 
         if ($storePerson['message'] == pStatusSuccess()) {
             $personDatas = $storePerson['data'];
 
-            $employeeModel = $this->employeeCreation($orginalDatas, $personDatas->id);
+            $employeeModel = $this->employeeCreation($datas, $personDatas->id);
+           
             if ($employeeModel['message'] == pStatusSuccess()) {
-                $organizationPerson = $this->organizationService->organizationPersonCreation($employeeModel['data']);
+             
+                $organizationPerson = $this->orgPersonService->organizationPersonCreation($employeeModel['data']);
+           
+              
                 if ($organizationPerson['message'] == pStatusSuccess()) {
                     return [
                         'message' => pStatusSuccess(),
@@ -66,12 +73,16 @@ dd($datas);
     }
     public function employeeCreation($orginalDatas, $personId)
     {
+
         $employeeModel =  $this->convertToHrmEmployee($orginalDatas, $personId);
         $storeEmployee = $this->employeeRepo->saveEmployee($employeeModel);
         return $storeEmployee;
     }
     public function convertToHrmEmployee($datas, $personId)
     {
+
+        $datas = (object)$datas;
+
 
         Log::info('PersonService->convertToPersonEmailModel:-Inside ' . json_encode($datas));
         if ($personId) {

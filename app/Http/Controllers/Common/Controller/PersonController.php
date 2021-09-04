@@ -21,6 +21,7 @@ class PersonController extends Controller
 
     public function personCreation(Request $request)
     {
+     
 
         $type = "person";
         Log::info('PersonController->Signup:-Inside ' . json_encode($request->all()));

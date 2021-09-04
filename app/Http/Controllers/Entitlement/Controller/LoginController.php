@@ -37,7 +37,7 @@ class LoginController extends Controller
 
     public function signin($mobile_no,$password) {
 
-
+	
 
 		if(Auth::attempt(['mobile' => $mobile_no, 'password' => $password, 'status' => 1])) {
 
@@ -50,11 +50,11 @@ class LoginController extends Controller
 			$success['user'] =  $user;
 			$success['person_id'] =  $user->person_id;
 			$success['image'] =  "";
-
+			$success['firstOrg'] =  0;
 			$success['token'] =  $user->createToken($user->name)->accessToken;
 
 
-			$success['firstOrg'] =  0;
+			
 
 			 $result = [
 				'status'=>1,

@@ -141,7 +141,8 @@ class PersonService
     // }
     public function personCreate($personDatas, $type)
     {
-        $datas = $personDatas->all();
+       
+        $datas = $personDatas;
         $validator = $this->personValidator($datas);
 
         if ($validator->fails()) {
@@ -171,6 +172,7 @@ class PersonService
 
     public function personSave($datas)
     {
+        
         if ($datas['pId'] == "false") {
             $datas['pId'] = false;
         }
@@ -211,6 +213,7 @@ class PersonService
                 'data' => $validator->messages()->first()
             ];
         }
+
         $userDatas =(object)$userDatas;
         $userModel = $this->convertToUserModel($userDatas);
      

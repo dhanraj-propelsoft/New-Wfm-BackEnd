@@ -65,8 +65,10 @@ Route::post('userCreation', 'App\Http\Controllers\Common\Controller\PersonContro
 // include_once ('login-api.php');
 Route::group(['middleware' => ['auth:api']], function () {
 
-    Route::resource('employee', 'App\Http\Controllers\Employee\Controller\EmployeeController');
+  // Route::post('employee', 'App\Http\Controllers\Employee\Controller\EmployeeController@store');
+   Route::post('employeeCreation','App\Http\Controllers\Employee\Controller\EmployeeController1@employeeCreation');
 
     Route::post('logout', 'App\Http\Controllers\Entitlement\Controller\LoginController@logout');
     include_once('organization-api.php');
+
 });

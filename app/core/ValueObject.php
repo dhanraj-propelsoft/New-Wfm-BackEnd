@@ -1,5 +1,5 @@
 <?php
-namespace App\Core;
+namespace App\core;
 
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Schema;

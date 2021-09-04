@@ -17,6 +17,7 @@ use App\Models\OrganizationModel\OrganizationPerson;
 use App\Http\Controllers\Organization\Model\OrganizationVO;
 use Hash;
 use App\Http\Controllers\Organization\Repository\OrganizationRepository;
+use App\Http\Controllers\Employee\Service\EmployeeService;
 
 class OrganizationService
 {
@@ -24,9 +25,10 @@ class OrganizationService
         /** 
          * * To connect Repo **
          */
-        public function __construct(OrganizationRepository $repo)
+        public function __construct(OrganizationRepository $repo, EmployeeService $employeeService)
         {
                 $this->repo = $repo;
+                $this->employeeService = $employeeService;
         }
 
 
@@ -51,7 +53,7 @@ class OrganizationService
         }
         public function save($request)
         {
-             
+               
                 Log::info('OrganizationService->save:-Inside ' . json_encode($request));
 
                 $rule = $this->validator($request);
@@ -73,18 +75,30 @@ class OrganizationService
 
 
                 $storedModel = $this->repo->save($model, $organizationPersonmodel);
+                $organizationDatas = $storedModel['data'];
+                $employeeData = ['personId' => Auth::user()->person_id, 'employee_code' => "", 'emergency_contact_no' => "", 'organization_id' => $organizationDatas->id];
+                $employeeModel = $this->employeeService->employeeCreation($employeeData, Auth::user()->person_id);
+                if ($employeeModel['message'] == pStatusSuccess()) {
 
-                Log::info('ProjectMasterService->save:-Return ' . json_encode($storedModel));
-
-                return $storedModel;
+                        return [
+                                'message' => pStatusSuccess(),
+                                'data' => $storedModel['data']
+                        ];
+                } else {
+                        return [
+                                'message' => pStatusFailed(),
+                                'data' => $employeeModel['data']
+                        ];
+                }
         }
         public function organizationPersonCreation($datas)
         {
+               
                 $model = OrganizationPerson::where('person_id', $datas->person_id)->where('organization_id', $datas->organization_id)->first();
                 if (!$model) {
                         $orgPersonModel = $this->convertToOrganizationPersonModel1($datas->person_id, $datas->organization_id);
                         $saveOrgPersonModel = $this->repo->saveOrgPerson($orgPersonModel);
-                       
+
                         if ($saveOrgPersonModel['message'] == pStatusSuccess()) {
                                 return [
                                         'message' => pStatusSuccess(),
@@ -103,7 +117,7 @@ class OrganizationService
                         ];
                 }
         }
-        public function convertToOrganizationPersonModel1($personId, $orgId=false)
+        public function convertToOrganizationPersonModel1($personId, $orgId = false)
         {
                 $model = new OrganizationPerson;
                 $model->person_id = $personId;

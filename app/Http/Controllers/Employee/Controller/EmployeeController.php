@@ -20,7 +20,7 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        
+        dd($request);
         $response = $this->employeeService->employeeStore($request);
         dd($response);
         return response()->json($response);
